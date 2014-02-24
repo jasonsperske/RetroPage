@@ -1,0 +1,30 @@
+$def with (system)
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-9 main">
+      <h1 class="page-header">$system.Name</h1>
+      <table class="table table-hover">
+        <colgroup>
+          <col>
+          <col class='Action'>
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Size</th>
+          </tr>
+        </thead>
+        <tbody>
+        	$:system.games()
+        </tbody>
+      </table>
+    </div>
+    <div class="col-sm-3 sidebar">
+      <div class="well">RetroPage is a web interface to your awesome RetoPie</div>
+      <form action="/upload" class="dropzone" id="retro-page-system-dropzone">
+        <input type='hidden' name='system' value='$system.Id'/>
+      </form>
+    </div>
+  </div>
+</div>
