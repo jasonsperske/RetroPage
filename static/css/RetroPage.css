@@ -1,0 +1,11 @@
+.sidebar, .main {
+	padding-top: 60px;
+}
+col.Action {
+	width: 60px;
+}
+.dz-message {
+	border: thin dashed #E2E2E2;
+	padding: 20px;
+	text-align: center;
+}
