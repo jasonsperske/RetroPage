@@ -9,3 +9,7 @@ col.Action {
 	padding: 20px;
 	text-align: center;
 }
+.dz-preview .dz-success-mark,
+.dz-preview .dz-error-mark {
+	display: none;
+}

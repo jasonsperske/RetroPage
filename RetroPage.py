@@ -3,6 +3,7 @@
 import ConfigParser
 from os import listdir
 from os.path import isfile, join, expanduser, getsize
+import json
 import humanize # from: https://pypi.python.org/pypi/humanize
 import web # from: http://webpy.org/
 
@@ -74,22 +75,23 @@ class _About:
         return render.about()
 class _Upload:
     def POST(self):
+        web.header('Content-Type', 'application/json')
         post = web.input(file={})
         if 'file' in post: # to check if the file-object is created
             system = systems.find(post.system)
             if system is None:
-                raise web.notfound('Cannot find system')
+                return json.dumps({'Success': False, 'error': 'Cannot find system'})
             else:
                 filepath=post.file.filename.replace('\\','/') # replaces the windows-style slashes with linux ones.
                 filename=filepath.split('/')[-1] # splits the and chooses the last part (the filename with extension)
                 fout = open(system.romPath(systems) + filename,'w') # creates the file where the uploaded file should be stored
                 fout.write(post.file.file.read()) # writes the uploaded file to the newly created file.
                 fout.close() # closes the file, upload complete.
-                raise web.seeother('/system/' + system.Id + '/')
+                return json.dumps({'Success': True})
 class _System:
     def GET(self,systemId):
         if systems.find(systemId) is None:
-            return web.notfound('Cannot find system')
+            raise web.notfound('Cannot find system')
         else:
             return render.system(systems.find(systemId))
 

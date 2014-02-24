@@ -36,10 +36,13 @@ $:content
     <script src="/static/js/bootstrap.min.js"></script>
     <script src="/static/js/dropzone.js"></script>
     <script type="text/javascript">
-      Dropzone.options.RetroPageSystemDropzone = {
-        paramName: "rom",
-        accept: function(file, done) {
-          done();
+      Dropzone.options.retroPageSystemDropzone = {
+        init: function() {
+          this.on("complete", function(file) {
+            if (this.getQueuedFiles().length == 0 && this.getUploadingFiles().length == 0) {
+              window.location.reload(true);
+            }
+          });
         }
       };
     </script>
