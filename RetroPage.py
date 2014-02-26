@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import ConfigParser
-from os import listdir
+from os import listdir, statvfs
 from os.path import isfile, join, expanduser, getsize
 import json
 import humanize # from: https://pypi.python.org/pypi/humanize
@@ -18,26 +18,29 @@ app = web.application(urls, globals())
 render = web.template.render('templates', base='base')
 
 class System:
-    def __init__(self,id,name,enabled):
-        self.Id = id
+    def __init__(self,guid,name,enabled):
+        self.Id = guid
         self.Name = name
         self.Enabled = enabled
 
-    def eq(self,id):
-        return self.Id==id
-
+    def eq(self,guid):
+        return self.Id==guid
+    
     def romPath(self,systems):
         return systems.BasePath+'/'+self.Id+'/'
 
     def games(self):
         html = ""
-        for game in [ f for f in listdir(self.romPath(systems)) if isfile(join(self.romPath(systems),f)) ]:
-            html += "<tr><td>"+game+"</td><td><code>"+humanize.naturalsize(getsize(self.romPath(systems)+game), binary=True)+"</code></td></tr>"
+        try:
+            for game in [ f for f in listdir(self.romPath(controller)) if isfile(join(self.romPath(controller),f)) ]:
+                html += "<tr><td>"+game+"</td><td class='text-right'><code>"+humanize.naturalsize(getsize(self.romPath(controller)+game), binary=True)+"</code></td></tr>"
+        except OSError:
+            html = ""
         return html
     def row(self):
         return "<tr><td><a href='/system/"+self.Id+"/' class='btn btn-primary btn-xs'>view</a></td><td>"+self.Name+"</td></tr>"
 
-class Systems:
+class Controller:
     def __init__(self,systems,basePath):
         self.Systems = systems
         self.BasePath = expanduser(basePath)
@@ -45,11 +48,17 @@ class Systems:
     def append(self,system):
         self.Systems.append(system)
 
-    def find(self,systemId):
+    def findSystem(self,systemId):
         for system in self.Systems:
             if system.eq(systemId):
                 return system
         return None
+
+    def getFreeSpace(self):
+        """ Return folder/drive free space (humanized)
+        """
+        st = statvfs(self.BasePath)
+        return humanize.naturalsize(st.f_bavail * st.f_frsize, binary=True)
 
     def table(self):
         html = ""
@@ -65,35 +74,35 @@ def readConfig():
         data.append(System(system, config.get(system, 'Name'), config.getboolean(system, 'Enabled')))
     return data, config.get('RetroPage', 'BasePath')
 
-systems = Systems(*readConfig())
+controller = Controller(*readConfig())
 
 class _Index:
     def GET(self):
-        return render.index(systems.table())
+        return render.index(controller)
 class _About:
     def GET(self):
-        return render.about()
+        return render.about(controller)
 class _Upload:
     def POST(self):
         web.header('Content-Type', 'application/json')
         post = web.input(file={})
         if 'file' in post: # to check if the file-object is created
-            system = systems.find(post.system)
+            system = controller.findSystem(post.system)
             if system is None:
                 return json.dumps({'Success': False, 'error': 'Cannot find system'})
             else:
                 filepath=post.file.filename.replace('\\','/') # replaces the windows-style slashes with linux ones.
                 filename=filepath.split('/')[-1] # splits the and chooses the last part (the filename with extension)
-                fout = open(system.romPath(systems) + filename,'w') # creates the file where the uploaded file should be stored
+                fout = open(system.romPath(controller) + filename,'w') # creates the file where the uploaded file should be stored
                 fout.write(post.file.file.read()) # writes the uploaded file to the newly created file.
                 fout.close() # closes the file, upload complete.
                 return json.dumps({'Success': True})
 class _System:
     def GET(self,systemId):
-        if systems.find(systemId) is None:
+        if controller.findSystem(systemId) is None:
             raise web.notfound('Cannot find system')
         else:
-            return render.system(systems.find(systemId))
+            return render.system(controller, controller.findSystem(systemId))
 
 if __name__ == "__main__":
     app.run()

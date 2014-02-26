@@ -1,4 +1,4 @@
-$def with (systems)
+$def with (controller)
 
 <div class="container-fluid">
   <div class="row">
@@ -16,11 +16,12 @@ $def with (systems)
           </tr>
         </thead>
         <tbody>
-          $:systems
+          $:controller.table()
         </tbody>
       </table>
     </div>
     <div class="col-sm-3 sidebar">
+      <div class='well'>You have <code>$controller.getFreeSpace()</code> available.</div>
       <div class="well">RetroPage is a web interface to your awesome RetoPie</div>
     </div>
   </div>
