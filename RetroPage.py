@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
 import ConfigParser
-from os import listdir, statvfs
-from os.path import isfile, join, expanduser, getsize
+import os
 import json
 import humanize # from: https://pypi.python.org/pypi/humanize
 import web # from: http://webpy.org/
@@ -10,6 +9,8 @@ import web # from: http://webpy.org/
 urls = (
     '/', '_Index',
     '/about', '_About',
+    '/delete', '_Delete',
+    '/rename', '_Rename',
     '/upload', '_Upload',
     '/system/([a-zA-Z\d]+)/', '_System'
 )
@@ -32,8 +33,8 @@ class System:
     def games(self):
         html = ""
         try:
-            for game in [ f for f in listdir(self.romPath(controller)) if isfile(join(self.romPath(controller),f)) ]:
-                html += "<tr><td>"+game+"</td><td class='text-right'><code>"+humanize.naturalsize(getsize(self.romPath(controller)+game), binary=True)+"</code></td></tr>"
+            for game in [ f for f in os.listdir(self.romPath(controller)) if os.path.isfile(os.path.join(self.romPath(controller),f)) ]:
+                html += "<tr><td class='FileName'>"+game+"</td><td class='text-right'><code>"+humanize.naturalsize(os.path.getsize(self.romPath(controller)+game), binary=True)+"</code></td></tr>"
         except OSError:
             html = ""
         return html
@@ -43,7 +44,7 @@ class System:
 class Controller:
     def __init__(self,systems,basePath):
         self.Systems = systems
-        self.BasePath = expanduser(basePath)
+        self.BasePath = os.path.expanduser(basePath)
 
     def append(self,system):
         self.Systems.append(system)
@@ -57,7 +58,7 @@ class Controller:
     def getFreeSpace(self):
         """ Return folder/drive free space (humanized)
         """
-        st = statvfs(self.BasePath)
+        st = os.statvfs(self.BasePath)
         return humanize.naturalsize(st.f_bavail * st.f_frsize, binary=True)
 
     def table(self):
@@ -82,6 +83,26 @@ class _Index:
 class _About:
     def GET(self):
         return render.about(controller)
+class _Delete:
+    def POST(self):
+        web.header('Content-Type', 'application/json')
+        post = web.input()
+        system = controller.findSystem(post.system)
+        if system is None:
+            return json.dumps({'Success': False, 'error': 'Cannot find system'})
+        else:
+            os.remove(system.romPath(controller)+post['name'])
+            return json.dumps({'Success': True})
+class _Rename:
+    def POST(self):
+        web.header('Content-Type', 'application/json')
+        post = web.input()
+        system = controller.findSystem(post.system)
+        if system is None:
+            return json.dumps({'Success': False, 'error': 'Cannot find system'})
+        else:
+            os.rename(system.romPath(controller)+post['from'], system.romPath(controller)+post['to'])
+            return json.dumps({'Success': True})
 class _Upload:
     def POST(self):
         web.header('Content-Type', 'application/json')

@@ -8,6 +8,10 @@ $def with (content)
 
     <title>RetroPage</title>
 
+    <script src="/static/js/jquery-1.11.0.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/dropzone.js"></script>
+
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/css/RetroPage.css" rel="stylesheet">
   </head>
@@ -32,19 +36,5 @@ $def with (content)
       </div>
     </div>
 $:content
-    <script src="/static/js/jquery-1.11.0.min.js"></script>
-    <script src="/static/js/bootstrap.min.js"></script>
-    <script src="/static/js/dropzone.js"></script>
-    <script type="text/javascript">
-      Dropzone.options.retroPageSystemDropzone = {
-        init: function() {
-          this.on("complete", function(file) {
-            if (this.getQueuedFiles().length == 0 && this.getUploadingFiles().length == 0) {
-              window.location.reload(true);
-            }
-          });
-        }
-      };
-    </script>
   </body>
 </html>

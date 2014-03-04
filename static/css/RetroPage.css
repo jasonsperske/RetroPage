@@ -13,3 +13,6 @@ col.Action {
 .dz-preview .dz-error-mark {
 	display: none;
 }
+#GameList td {
+    cursor: pointer;
+}
