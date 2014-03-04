@@ -126,4 +126,4 @@ class _System:
             return render.system(controller, controller.findSystem(systemId))
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=1980)
