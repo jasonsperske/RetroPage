@@ -126,4 +126,4 @@ class _System:
             return render.system(controller, controller.findSystem(systemId))
 
 if __name__ == "__main__":
-    app.run(port=1980)
+    web.httpserver.runsimple(app.wsgifunc(), ("0.0.0.0", 1980))
