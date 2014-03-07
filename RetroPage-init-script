@@ -1,0 +1,34 @@
+#!/bin/sh
+ 
+### BEGIN INIT INFO
+# Provides: RetroPage
+# Required-Start: $remote_fs $syslog
+# Required-Stop: $remote_fs $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Starts RetroPage
+# Description: Starts a web.py based server to manage the RetroPie
+### END INIT INFO
+
+DAEMON=/usr/bin/python
+DAEMON_NAME=RetroPage
+ARGS=/home/pi/RetroPage/RetroPage.py 
+DAEMON_USER=pi
+PIDFILE=/var/run/$DAEMON_NAME.pid
+
+case "$1" in 
+    start)
+        echo "Starting RetroPage"
+        start-stop-daemon --start -b --pidfile $PIDFILE --make-pidfile --user $DAEMON_USER --group $DAEMON_USER --chuid $DAEMON_USER --chdir /home/pi/RetroPage --exec $DAEMON $ARGS
+        ;;
+    stop)
+        echo "Stopping RetroPage"
+        start-stop-daemon --stop --pidfile $PIDFILE --retry 10
+        ;;
+    *)
+        echo "Usage: /etc/init.d/RetroPage start|stop"
+        exit 1
+        ;;
+esac
+
+exit 0
