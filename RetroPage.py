@@ -33,7 +33,7 @@ class System:
     def games(self):
         html = ""
         try:
-            for game in [ f for f in os.listdir(self.romPath(controller)) if os.path.isfile(os.path.join(self.romPath(controller),f)) ]:
+            for game in sorted([ f for f in os.listdir(self.romPath(controller)) if os.path.isfile(os.path.join(self.romPath(controller),f)) ]):
                 html += "<tr><td class='FileName'>"+game+"</td><td class='text-right'><code>"+humanize.naturalsize(os.path.getsize(self.romPath(controller)+game), binary=True)+"</code></td></tr>"
         except OSError:
             html = ""
