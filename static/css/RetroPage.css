@@ -16,12 +16,12 @@ col.Action {
 .dz-progress {
 	display: block;
 	height: 6px;
-	width: 1%;
 }
 .dz-upload {
 	display:block;
 	height: 6px;
-	background-color: rgba(0,255,0,0.7)
+	background-color: rgba(0,255,0,0.7);
+	width: 1%;
 }
 #GameList td {
     cursor: pointer;
