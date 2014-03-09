@@ -13,6 +13,15 @@ col.Action {
 .dz-preview .dz-error-mark {
 	display: none;
 }
+.dz-progress {
+	display: block;
+	height: 6px;
+}
+.dz-upload {
+	display:block;
+	height: 6px;
+	background-color: rgba(0,255,0,0.7)
+}
 #GameList td {
     cursor: pointer;
 }
