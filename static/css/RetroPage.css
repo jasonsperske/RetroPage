@@ -16,6 +16,7 @@ col.Action {
 .dz-progress {
 	display: block;
 	height: 6px;
+	width: 1%;
 }
 .dz-upload {
 	display:block;
